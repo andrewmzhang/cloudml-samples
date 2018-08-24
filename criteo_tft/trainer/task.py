@@ -270,11 +270,11 @@ def get_experiment_fn(args):
       estimator = tf.contrib.learn.LinearClassifier(
           model_dir=output_dir,
           feature_columns=columns,
-          optimizer=tf.contrib.linear_optimizer.SDCAOptimizer(
-              example_id_column=KEY_FEATURE_COLUMN,
-              symmetric_l2_regularization=l2_regularization,
-              num_loss_partitions=num_partitions,  # workers
-              num_table_shards=num_table_shards))  # ps
+          optimizer=tf.train.GradientDescentOptimizer(
+              learning_rate=0.01
+              #example_id_column=KEY_FEATURE_COLUMN,
+              #symmetric_l2_regularization=l2_regularization,
+              ))  # ps
     elif args.model_type == DEEP:
       estimator = tf.contrib.learn.DNNClassifier(
           hidden_units=args.hidden_units,

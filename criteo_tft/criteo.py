@@ -69,7 +69,8 @@ def make_input_schema(mode=tf.contrib.learn.ModeKeys.TRAIN):
                                       default_value='')
 
   return dataset_schema.from_feature_spec(result)
-
+import numpy
+numpy.set_printoptions(threshold=numpy.nan)
 
 def make_preprocessing_fn(frequency_threshold):
   """Creates a preprocessing function for criteo.
@@ -95,8 +96,10 @@ def make_preprocessing_fn(frequency_threshold):
     for name in INTEGER_COLUMN_NAMES:
       result[name] = inputs[name]
     for name in CATEGORICAL_COLUMN_NAMES:
-      result[name + '_id'] = tft.string_to_int(
+      cat_col = tft.string_to_int(
           inputs[name], frequency_threshold=frequency_threshold)
+      cat_col = tf.Print(cat_col, [cat_col, inputs[name]], message="Preprocess_fn", summarize=10)
+      result[name + '_id'] = cat_col
 
     return result
 

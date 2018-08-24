@@ -101,6 +101,11 @@ def _Shuffle(pcoll):  # pylint: disable=invalid-name
           | 'GroupByRandom' >> beam.GroupByKey()
           | 'DropRandom' >> beam.FlatMap(lambda (k, vs): vs))
 
+INTEGER_COLUMN_NAMES = [
+            'int-feature-{}'.format(column_idx) for column_idx in range(1, 14)]
+CATEGORICAL_COLUMN_NAMES = [
+            'categorical-feature-{}_id'.format(column_idx) for column_idx in range(14, 40)]
+
 
 def preprocess(pipeline, training_data, eval_data, predict_data, output_dir,
                frequency_threshold, delimiter):
@@ -156,6 +161,15 @@ def preprocess(pipeline, training_data, eval_data, predict_data, output_dir,
     pcoll |= 'Shuffle' >> _Shuffle()  # pylint: disable=no-value-for-parameter
     (dataset, metadata) = (((pcoll, input_metadata), transform_fn)
                            | 'Transform' >> tft.TransformDataset())
+    #coder = criteo.make_csv_coder(input_schema, delimiter)
+    #coder = coders.ExampleProtoCoder(metadata.schema)
+    column_names =  ['clicked']
+    #for name in INTEGER_COLUMN_NAMES:
+    #  column_names.append(name)
+    #for name in CATEGORICAL_COLUMN_NAMES:
+    #  column_names.append(name)
+
+    #coder = coders.CsvCoder(column_names, metadata.schema, delimiter=",")
     coder = coders.ExampleProtoCoder(metadata.schema)
     _ = (dataset
          | 'SerializeExamples' >> beam.Map(coder.encode)
