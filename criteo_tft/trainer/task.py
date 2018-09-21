@@ -131,6 +131,11 @@ def create_parser():
       default=30000,
       type=int)
   parser.add_argument(
+      '--learning_rate',
+      help='Learning rate',
+      default=1,
+      type=float)
+  parser.add_argument(
       '--eval_batch_size',
       help='Number of eval records used per batch',
       default=5000,
@@ -271,7 +276,7 @@ def get_experiment_fn(args):
           model_dir=output_dir,
           feature_columns=columns,
           optimizer=tf.train.GradientDescentOptimizer(
-              learning_rate=0.01
+              learning_rate=args.learning_rate
               #example_id_column=KEY_FEATURE_COLUMN,
               #symmetric_l2_regularization=l2_regularization,
               ))  # ps
@@ -346,7 +351,8 @@ def main(argv=None):
     with tf.Session():
       tf.write_file(args.eval_only_summary_filename, json_out).run()
   else:
-    learn_runner.run(experiment_fn=get_experiment_fn(args),
+    with tf.device('/device:GPU:7'):
+      learn_runner.run(experiment_fn=get_experiment_fn(args),
                      output_dir=output_dir)
 
 
